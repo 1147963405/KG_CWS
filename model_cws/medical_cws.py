@@ -13,7 +13,7 @@ os.environ["CUDA_VISIBLE_DEVICES"] = "2"
 
 class medical_seg(object):
     def __init__(self):
-        self.NEWPATH = 'D:/CMe_KG/CMeKG/model/medical_cws/pytorch_model.pkl'
+        self.NEWPATH = medical_tool_model
         if torch.cuda.is_available():
             self.device = torch.device("cuda", 0)
             self.use_cuda = True
@@ -21,10 +21,10 @@ class medical_seg(object):
             self.device = torch.device("cpu")
             self.use_cuda = False
 
-        self.vocab = load_vocab('D:/CMe_KG/CMeKG/model/medical_cws/vocab.txt')
+        self.vocab = load_vocab(vocab_file)
         self.vocab_reverse = {v: k for k, v in self.vocab.items()}
 
-        self.model = BERT_LSTM_CRF('D:/CMe_KG/CMeKG/model/medical_cws', tagset_size, 768, 200, 2,
+        self.model = BERT_LSTM_CRF(medical_bert, tagset_size, 768, 200, 2,
                               dropout_ratio=0.5, dropout1=0.5, use_cuda=use_cuda)
 
         if use_cuda:
@@ -180,6 +180,7 @@ class medical_seg(object):
         self.model.load_state_dict(torch.load(self.NEWPATH, map_location={'cuda:0': str(self.device)}))
         self.model.eval()
 
+        os.makedirs(os.path.dirname(output_file), exist_ok=True)
         op_file = codecs.open(output_file, 'w', 'utf-8')
         for i, dev_batch in enumerate(test_loader):
             sentence, masks, lengths = dev_batch

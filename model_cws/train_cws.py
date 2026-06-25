@@ -141,6 +141,8 @@ if use_cuda:
 optimizer = getattr(optim, 'Adam')
 optimizer = optimizer(model.parameters(), lr=0.00001, weight_decay=0.00005)
 
+os.makedirs(save_model_dir, exist_ok=True)
+
 best_f = -100
 # pre-training test
 p_b, r_b, f_b = evaluate(model, dev_loader)
